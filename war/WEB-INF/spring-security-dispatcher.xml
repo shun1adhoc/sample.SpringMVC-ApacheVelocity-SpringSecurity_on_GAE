@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+                        http://www.springframework.org/schema/security
+                        http://www.springframework.org/schema/security/spring-security-3.1.xsd
+                        ">
+
+
+    <!-- Spring Security Setting -->
+
+<!--
+    <global-method-security pre-post-annotations="enabled" />
+-->
+
+
+<http use-expressions="true">
+    <intercept-url pattern="/index.html" access="permitAll" />
+    <!-- <intercept-url pattern="/velocity/login" access="permitAll" requires-channel="https"/> -->
+    <intercept-url pattern="/velocity/login" access="permitAll"/>
+    <intercept-url pattern="/velocity/loginfailed" access="permitAll" />
+    <intercept-url pattern="/velocity/logout" access="permitAll" />
+    
+    <intercept-url pattern="/velocity/admin/**" access="hasRole('supervisor')" />
+    <intercept-url pattern="/velocity/user/**" access="isAuthenticated()" />
+    <intercept-url pattern="/**" access="denyAll" />
+
+    <form-login login-page="/velocity/login" default-target-url="/index.html"
+        authentication-failure-url="/velocity/loginfailed" />
+
+    <logout logout-success-url="/velocity/logout" delete-cookies="JSESSIONID"/>
+    
+    <!--
+    <access-denied-handler error-page="/velocity/403"/>
+
+    <port-mappings>
+      <port-mapping http="8888" https="8888"/>
+    </port-mappings>
+    -->
+</http>
+
+
+    <!--
+    Usernames/Passwords are
+        admin/admin
+        bob/bob
+    -->
+    <beans:bean id="encoder" class="org.springframework.security.crypto.password.StandardPasswordEncoder"/>
+
+    <authentication-manager>
+        <authentication-provider>
+            <password-encoder ref="encoder"/>
+            <user-service>
+                <user name="admin" password="d4c4f5f190abf98b0d5224b549a1f2645acf975c75ec5d2d51895b0a7ca35949fc33576cc8294769" authorities="supervisor, user" />
+                <user name="bob" password="cb60b076bebc371a3e5f6097399a82eb65948513639f4b090e70e2d49b6808fa3b02aa9bcd25668f" authorities="user" />
+            </user-service>
+        </authentication-provider>
+    </authentication-manager>
+
+</beans:beans>
